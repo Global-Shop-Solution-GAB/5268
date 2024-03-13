@@ -1,0 +1,700 @@
+Program.Sub.ScreenSU.Start
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+'Alejandro Anazco
+'Modification: Add a second column for Material and Material Req. added if logic to avoid blank data and a split in the material UDT Field.
+'Modification: Add a new querie for second materials and material req.
+'Subroutines Changed: ProcessIMM. WriteIMM
+Variable.UDT.IMMData.Define("Seq",String,SEQ)
+Variable.UDT.IMMData.Define("Job",String,JOB)
+Variable.UDT.IMMData.Define("LMO",String,LMO)
+Variable.UDT.IMMData.Define("Part",String,PART)
+Variable.UDT.IMMData.Define("Press",String,PRESS)
+Variable.UDT.IMMData.Define("Scheduled",String,SCHEDULED)
+Variable.UDT.IMMData.Define("DueDate",String,DUE_DATE)
+Variable.UDT.IMMData.Define("PO",String,PO)
+Variable.UDT.IMMData.Define("QTY",String,QTY)
+Variable.UDT.IMMInvData.Define("Description",String,DESCRIPTION)
+Variable.UDT.IMMInvData.Define("ProductLine",String,PRODUCT_LINE)
+Variable.UDT.IMMInvData.Define("Part",String,INV_PART)
+Variable.UDT.IMMInvData.Define("TargetCycle",String,TARGET_CYCLE)
+Variable.UDT.IMMInvData.Define("TotalMaterial",Long,TOTAL_MATERIAL)
+Variable.UDT.IMMInvData.Define("Qty",String,QTY)
+Variable.UDT.AMBYKey.Define("Job",String,JOB)
+Variable.UDT.AMBYKey.Define("SEQ",String,SEQ)
+Variable.UDT.AMBYKey.Define("Machine",String,MACHINE)
+Variable.UDT.IMMOutput.Define("DueDate",String)
+Variable.UDT.IMMOutput.Define("Hours",Long)
+Variable.UDT.IMMOutput.Define("LMO",String)
+Variable.UDT.IMMOutput.Define("MaterialNumber",String)
+variable.UDT.IMMOutput.Define("MaterialNumber2", String)
+Variable.UDT.IMMOutput.Define("Part",String)
+Variable.UDT.IMMOutput.Define("Press",String)
+Variable.UDT.IMMOutput.Define("Description",String)
+Variable.UDT.IMMOutput.Define("PiecesBox",Long)
+Variable.UDT.IMMOutput.Define("PO",String)
+Variable.UDT.IMMOutput.Define("QTY",Long)
+Variable.UDT.IMMOutput.Define("Scheduled",String)
+Variable.UDT.IMMOutput.Define("StartDate",String)
+Variable.UDT.IMMOutput.Define("TargetCycle",String)
+Variable.UDT.IMMOutput.Define("TotalColorantReq",String)
+Variable.UDT.IMMOutput.Define("TotalMaterialReq",String)
+Variable.UDT.IMMOutput.Define("TotalMaterialReq2",String)
+Variable.UDT.IMMOutput.Define("MoldNumber",String)
+Variable.uGlobal.uIMMInvData.Declare("IMMInvData")
+Variable.uGlobal.uAMBYKey.Declare("AMBYKey")
+Variable.UDT.AMBYInvData.Define("Part",String,PART)
+Variable.UDT.AMBYInvData.Define("ProductLine",String,PRODUCT_LINE)
+Variable.UDT.AMBYInvData.Define("Description",String,DESCRIPTION)
+Variable.UDT.AMBYInvData.Define("QTY",String,QTY)
+Variable.uGlobal.uAMBYInvData.Declare("AMBYInvData")
+Variable.UDT.AMBYData.Define("Job",String,JOB)
+Variable.UDT.AMBYData.Define("Seq",String,SEQ)
+Variable.UDT.AMBYData.Define("LMO",String,LMO)
+Variable.UDT.AMBYData.Define("Scheduled",String,SCHEDULED)
+Variable.UDT.AMBYData.Define("Press",String,Press)
+Variable.UDT.AMBYData.Define("WCName",String,WC_NAME)
+Variable.UDT.AMBYData.Define("StartDate",String,START_DATE)
+Variable.UDT.AMBYData.Define("DueDate",String,DUE_DATE)
+Variable.UDT.AMBYData.Define("Customer",String,CUSTOMER)
+Variable.UDT.AMBYData.Define("PO",String,PO)
+Variable.UDT.AMBYData.Define("Part",String,PART)
+Variable.UDT.AMBYData.Define("QTY",String,QTY)
+Variable.UDT.AMBYData.Define("MaterialNumber",String,MATERIAL_NUM)
+Variable.UDT.AMBYData.Define("Hours",Float,HOURS)
+Variable.UDT.AMBYData.Define("Router",String,ROUTER)
+Variable.UDT.AMBYData.Define("Router_Seq",String,ROUTER_SEQ)
+Variable.uGlobal.uAMBYData.Declare("AMBYData")
+Variable.UDT.AMBYOutput.Define("Workcenter",String)
+Variable.UDT.AMBYOutput.Define("WorkcenterName",String)
+Variable.UDT.AMBYOutput.Define("Customer",String)
+Variable.UDT.AMBYOutput.Define("PO",String)
+Variable.UDT.AMBYOutput.Define("ShipDate",String)
+Variable.UDT.AMBYOutput.Define("Part",String)
+Variable.UDT.AMBYOutput.Define("Description",String)
+Variable.UDT.AMBYOutput.Define("QTY",Long)
+Variable.UDT.AMBYOutput.Define("PiecesBox",Long)
+Variable.UDT.AMBYOutput.Define("PartsReady",String)
+Variable.UDT.AMBYOutput.Define("BaseRotor1",String)
+Variable.UDT.AMBYOutput.Define("BaseRotor2",String)
+Variable.UDT.AMBYOutput.Define("JOB",String)
+Variable.UDT.AMBYOutput.Define("RunHours",Float)
+Variable.UDT.AMBYOutput.Define("Boxes",Float)
+Variable.UDT.AMBYOutput.Define("Router",String)
+Variable.UDT.AMBYOutput.Define("Router_Seq",String)
+Variable.UDT.AMBYOutput.Define("comment_2",String)
+Variable.UDT.AMBYOutput.Define("comment_3",String)
+Variable.UDT.AMBYOutput.Define("comment_4",String)
+Variable.UDT.AMBYOutput.Define("comment_5",String)
+Variable.UDT.AMBYOutput.Define("comment_1",String)
+Variable.UDT.AMBYOutput.Define("comment_6",String)
+Variable.UDT.AMBYOutput.Define("comment_7",String)
+Variable.UDT.AMBYOutput.Define("comment_8",String)
+Variable.uGlobal.uAMBYOutput.Declare("AMBYOutput")
+Variable.UDT.IMMKey.Define("JOB",String,JOB)
+Variable.uGlobal.uIMMKey.Declare("IMMKey")
+Variable.UDT.IMMData.Define("StartDate",String)
+Variable.UDT.IMMData.Define("JobOPHours",Long,JobOPHours)
+Variable.UDT.IMMData.Define("PiecesPerCarton",Float,PPC)
+Variable.UDT.IMMData.Define("Router",String,ROUTER)
+Variable.UDT.IMMData.Define("Router_Seq",String,ROUTER_SEQ)
+Variable.UDT.IMMOutput.Define("JOB",String)
+Variable.UDT.IMMOutput.Define("BoxesReq",Float)
+Variable.UDT.IMMOutput.Define("Comments",String)
+Variable.UDT.IMMOutput.Define("comment_1",String)
+Variable.UDT.IMMOutput.Define("comment_2",String)
+Variable.UDT.IMMOutput.Define("comment_3",String)
+Variable.UDT.IMMOutput.Define("comment_4",String)
+Variable.UDT.IMMOutput.Define("comment_5",String)
+Variable.UDT.IMMOutput.Define("comment_6",String)
+Variable.UDT.IMMOutput.Define("comment_7",String)
+Variable.UDT.IMMOutput.Define("comment_8",String)
+Variable.uGlobal.uIMMOutput.Declare("IMMOutput")
+Variable.Global.iCount2.Declare(Long,1)
+Variable.uGlobal.uIMMData.Declare("IMMData")
+Variable.UDT.IMMInvDATA2.Define("ROUTER",String,JOB_OP_PART)
+Variable.UDT.IMMInvDATA2.Define("MoldNumber",String,MOLD_NO)
+Variable.UDT.IMMInvDATA2.Define("Description",String,DESCRIPTION)
+Variable.UDT.IMMInvDATA2.Define("TargetCycle",Long,TARGET_CYCLE)
+Variable.uGlobal.uIMMInvDATA2.Declare("IMMInvDATA2")
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+
+
+Function.ODBC.Connection!Conx.OpenConnection(Variable.ambient.PDSN,Variable.Ambient.PUSER,Variable.Ambient.PPass)
+F.Intrinsic.Control.CallSub(Loadudts)
+F.Intrinsic.Control.CallSub(Processimm)
+F.Intrinsic.Control.CallSub(Processamby)
+F.Intrinsic.Control.CallSub(Writeimm)
+F.Intrinsic.Control.CallSub(Writeamby)
+F.Intrinsic.UI.Msgbox("Done")
+f.Intrinsic.Control.End
+Program.Sub.Main.End
+
+Program.Sub.WriteIMM.Start
+V.Local.sFileName.Declare(String)
+V.Local.sFileDir.Declare(String)
+V.Local.bExists.Declare(Boolean)
+V.Local.iHdl.Declare(Long)
+V.Local.sText.Declare(String)
+V.Local.sData.Declare(String)
+V.Local.sDate.Declare(String)
+V.Local.sRet.Declare(String)
+V.Local.iCount.Declare(Long)
+V.Local.iCount3.Declare(Long)
+V.Local.iCount4.Declare(Long)
+V.Local.iHours.Declare(Long)
+V.Local.sCurrentSeq.Declare(String)
+V.Local.iBarRow.Declare(Long)
+V.Local.iTotalHours.Declare(Float)
+V.Local.iTotalDays.Declare(Float)
+V.Local.iTotalBoxes.Declare(Float)
+V.Local.iPieces.Declare(Long)
+V.Local.sDate1.Declare(String)
+V.Local.sDate2.Declare(String)
+V.Local.sDate3.Declare(String)
+V.Local.sPart1.Declare(String)
+V.Local.sPart2.Declare(String)
+V.Local.sPart3.Declare(String)
+V.Local.sBoxes.Declare(String)
+
+'Defines the spreadsheet name
+F.Intrinsic.String.Concat(V.Caller.FilesDir,"\GCG_5268_GSSchedule.xls",V.Local.sFileDir)
+'GAB Excel formalities
+Function.Automation.MSExcel.CreateAppObject("MSExcel")
+Function.Automation.MSExcel.OpenWorkBook("MSExcel","CMi",V.Local.sFileDir)
+Function.Automation.MSExcel.OpenWorkSheet("CMi","NewWOs",2)
+Function.Automation.MSExcel.OpenWorkSheet("CMi","IMMFormatting",4)
+'Set the column number to start writing to
+V.Local.iCount3.Set(1)
+'Reading from the UDT that has all the data to be written to the Excel file.
+V.Local.sCurrentSeq.Set("")
+
+F.Intrinsic.Control.For(V.local.iCount,0,V.uGlobal.uIMMOutput.UBound,1)
+'F.Intrinsic.Debug.InvokeDebugger
+'F.Intrinsic.Debug.Stop
+
+	F.Intrinsic.Variable.UDTPositionToString(V.uGlobal.uIMMOutput,"comment_1*!*comment_2*!*comment_3*!*comment_4*!*comment_5*!*comment_6*!*comment_7*!*comment_8*!*Job*!*Scheduled*!*Press*!*StartDate*!*DueDate*!*PO*!*Part*!*MoldNumber*!*Description*!*QTY*!*Hours*!*MaterialNumber*!*MaterialNumber2*!*TotalMaterialReq*!*TotalMaterialReq2*!*TotalColorantReq*!*TargetCycle*!*PiecesBox*!*BoxesReq",V.Local.iCount,"*!*",V.Local.sText)
+	F.Intrinsic.String.Split(V.Local.sText,"*!*",V.Local.sRet)
+
+		V.Local.sDate1.set(V.Local.sRet(9))
+		F.Intrinsic.String.Left(V.Local.sDate1,2,V.Local.sPart1)
+		F.Intrinsic.String.Mid(V.Local.sDate1,3,2,V.Local.sPart2)
+		F.Intrinsic.String.Right(V.Local.sDate1,2,V.Local.sPart3)
+		F.Intrinsic.String.Concat(V.Local.sPart1,"/",V.Local.sPart2,"/",V.Local.sPart3,V.Local.sRet(9))
+
+		V.Local.sDate2.set(V.Local.sRet(12))
+		F.Intrinsic.String.Left(V.Local.sDate2,2,V.Local.sPart1)
+		F.Intrinsic.String.Mid(V.Local.sDate2,3,2,V.Local.sPart2)
+		F.Intrinsic.String.Right(V.Local.sDate2,2,V.Local.sPart3)
+		F.Intrinsic.String.Concat(V.Local.sPart1,"/",V.Local.sPart2,"/",V.Local.sPart3,V.Local.sRet(12))
+		
+		F.Intrinsic.String.Instr(V.Local.sRet(24),".",0,V.Local.sBoxes)
+		F.Intrinsic.Control.If(V.Local.sBoxes,>,0)
+			F.Intrinsic.Math.Ceiling(V.Local.sRet(24),V.Local.sRet(24))
+		F.Intrinsic.Control.EndIf
+
+		F.Intrinsic.Control.For(V.Local.iCount4,0,V.Local.sRet.UBound,1)
+			F.Automation.MSExcel.WriteCell("NewWOs",V.Global.iCount2,V.Local.iCount3,V.Local.sRet(v.Local.iCount4))
+			F.Intrinsic.Math.Add(V.Local.iCount3,1,V.Local.iCount3)
+		F.Intrinsic.Control.Next(V.Local.iCount4)
+	'Add 1 to the row count
+	F.Intrinsic.Math.Add(V.Global.iCount2,1,V.Global.iCount2)
+
+'Reset the column number back to 1
+V.Local.iCount3.Set(1)
+
+F.Intrinsic.Control.Next(V.Local.iCount)
+'MoreGABExcelformalities
+Function.Automation.MSExcel.SaveWorkBook("CMi")
+Function.Automation.MSExcel.DestroyAllObjects("MSExcel","CMi","NewWOs")
+Program.Sub.WriteIMM.End
+
+Program.Sub.WriteAMBY.Start
+V.Local.sFileName.Declare(String)
+V.Local.sFileDir.Declare(String)
+V.Local.bExists.Declare(Boolean)
+V.Local.iHdl.Declare(Long)
+V.Local.sText.Declare(String)
+V.Local.sData.Declare(String)
+V.Local.sDate.Declare(String)
+V.Local.sRet.Declare(String)
+V.Local.sRet2.Declare(String)
+V.Local.iCount.Declare(Long)
+V.Local.iCount2.Declare(Long)
+V.Local.iCount3.Declare(Long)
+V.Local.iCount4.Declare(Long)
+V.Local.iHours.Declare(Long)
+V.Local.sCurrentSeq.Declare(String)
+V.Local.iBarRow.Declare(Long)
+V.Local.iTotalHours.Declare(Float)
+V.Local.iTotalDays.Declare(Float)
+V.Local.sTotalBoxes.Declare(String)
+V.Local.iPieces.Declare(Long)
+V.Local.sDate1.Declare(String)
+V.Local.sDate2.Declare(String)
+V.Local.sPart1.Declare(String)
+V.Local.sPart2.Declare(String)
+V.Local.sPart3.Declare(String)
+V.Local.iRunHours.Declare(String)
+V.Local.bInstr.Declare(Boolean)
+V.Local.sBoxes.Declare(String)
+
+
+'Defines the spreadsheet name
+F.Intrinsic.String.Concat(V.Caller.FilesDir,"\GCG_5268_GSSchedule.xls",V.Local.sFileDir)
+'GAB Excel formalities
+Function.Automation.MSExcel.CreateAppObject("MSExcel")
+Function.Automation.MSExcel.OpenWorkBook("MSExcel","CMi",V.Local.sFileDir)
+Function.Automation.MSExcel.OpenWorkSheet("CMi","Sheet1",6)
+'Function.Automation.MSExcel.OpenWorkSheet("CMi","AMBYFormatting",5)
+
+'Set the row number to start writing to
+V.Local.iCount2.Set(1)
+'Set the column number to start writing to
+V.Local.iCount3.Set(1)
+'Reading from the UDT that has all the data to be written to the Excel file.
+F.Intrinsic.Variable.UDTMultiQuickSort(V.uGlobal.uAMBYOutput!Workcenter,False)
+V.Local.sCurrentSeq.Set("")
+
+F.Intrinsic.Control.For(V.local.iCount,0,V.uGlobal.uAMBYOutput.UBound,1)
+'F.Intrinsic.Debug.InvokeDebugger
+'F.Intrinsic.Debug.Stop
+	F.Intrinsic.Variable.UDTPositionToString(V.uGlobal.uAMBYOutput,"comment_1*!*comment_2*!*comment_3*!*comment_4*!*comment_5*!*comment_6*!*comment_7*!*comment_8*!*JOB*!*Workcenter*!*WorkcenterName*!*Customer*!*PO*!*ShipDate*!*PartsReady*!*Part*!*BaseRotor1*!*BaseRotor2*!*Description*!*QTY*!*PiecesBox*!*RunHours*!*Boxes",V.Local.iCount,"*!*",V.Local.sText)
+	F.Intrinsic.String.Split(V.Local.sText,"*!*",V.Local.sRet)
+	V.Local.sDate1.set(V.Local.sRet(13))
+	F.Intrinsic.String.Left(V.Local.sDate1,2,V.Local.sPart1)
+	F.Intrinsic.String.Mid(V.Local.sDate1,3,2,V.Local.sPart2)
+	F.Intrinsic.String.Right(V.Local.sDate1,2,V.Local.sPart3)
+	F.Intrinsic.String.Concat(V.Local.sPart1,"/",V.Local.sPart2,"/",V.Local.sPart3,V.Local.sRet(13))
+
+	F.Intrinsic.String.Instr(V.Local.sRET(22),".",0,V.Local.sBoxes)
+		F.Intrinsic.Control.If(V.Local.sBoxes,>,0)
+			F.Intrinsic.Math.Ceiling(V.Local.sRet(22),V.Local.sRet(22))
+		F.Intrinsic.Control.EndIf
+	
+	F.Intrinsic.Control.If(V.Local.sRet(17),=,"")
+
+		F.Intrinsic.Control.For(V.Local.iCount4,0,V.Local.sRet.UBound,1)
+			F.Intrinsic.Control.If(V.Local.iCount3,=,10)
+				F.Intrinsic.Math.Add(V.Local.iCount4,1,V.Local.iCount4)
+			F.Intrinsic.Control.EndIf
+
+			F.Automation.MSExcel.WriteCell("Sheet1",V.Local.iCount2,V.Local.iCount3,V.Local.sRet(v.Local.iCount4))
+			F.Intrinsic.Math.Add(V.Local.iCount3,1,V.Local.iCount3)
+		F.Intrinsic.Control.Next(V.Local.iCount4)
+
+	F.Intrinsic.Control.Else
+
+		F.Intrinsic.Control.For(V.Local.iCount4,0,V.Local.sRet.UBound,1)
+
+			F.Automation.MSExcel.WriteCell("Sheet1",V.Local.iCount2,V.Local.iCount3,V.Local.sRet(v.Local.iCount4))
+			F.Intrinsic.Math.Add(V.Local.iCount3,1,V.Local.iCount3)
+
+	F.Intrinsic.Control.Next(V.Local.iCount4)
+
+	F.Intrinsic.Control.EndIf
+
+	'Function.Automation.MSExcel.CopyCellFormat(source worksheet object, target worksheet object, starting column number, starting row number, ending column number, ending row number, target starting column number, target starting row number, ignore errors boolean)
+	F.Intrinsic.Math.Add(V.Local.iCount2,1,V.Local.iCount2)
+'Reset the column number back to 1
+V.Local.iCount3.Set(1)
+'Add 1 to the row count
+F.Intrinsic.Control.Next(V.Local.iCount)
+
+'More GAB Excel formalities
+Function.Automation.MSExcel.SaveWorkBook("CMi")
+Function.Automation.MSExcel.DestroyAllObjects("MSExcel","CMi","Sheet1")
+
+Program.Sub.WriteAMBY.End
+
+Program.Sub.ProcessIMM.Start
+V.Local.sQuery.Declare(String)
+V.Local.iCount.Declare(Long)
+V.Local.iCount2.Declare(Long)
+V.Local.iCount3.Declare(Long)
+V.Local.iCount4.Declare(Long)
+V.Local.iHours.Declare(Long)
+V.Local.iQTY.Declare(Long)
+V.Local.iPieces.Declare(Long)
+V.Local.iQTYINV.Declare(Long)
+V.Local.sRET.Declare(String)
+V.Local.sRET2.Declare(String)
+V.Local.sRET3.Declare(String)
+V.Local.sRET4.Declare(String)
+V.Local.sRET5.Declare(String)
+V.Local.sRETP.Declare(String)
+V.Local.FBoxes.Declare(Float)
+V.Local.iRedimUbound.Declare(String)
+V.Local.iRedimUbound.Set(-1)
+V.uGlobal.uIMMOUTPUT.Redim(-1,-1)
+V.Local.sSQL0.Declare(String)
+V.Local.sSQL2.Declare(String)
+V.Local.sComment.Declare(String)
+V.Local.sComment2.Declare(String)
+V.Local.sRouter.Declare(String)
+V.Local.sRouterinc.Declare(String)
+V.Local.iVar.Declare(Long)
+v.Local.sMaterialSplit.Declare
+v.Local.sSQLMaterials.Declare
+
+
+F.Intrinsic.Control.For(V.Local.iCount,0,V.uGlobal.uIMMKey.Ubound,1)
+	'f.Intrinsic.UI.Msgbox(V.uGlobal.uIMMDATA!JOB)
+	
+	F.Intrinsic.Variable.UDTSeek(V.uGlobal.uIMMDATA!JOB,V.uGlobal.uIMMKey(V.Local.iCount)!JOB,0,V.Local.sRET)
+	'original line
+	F.Intrinsic.Control.If(V.Local.sRET.Trim,<>,"")
+	'Also checks if the sRetvalue is 0
+	'F.Intrinsic.Control.If(V.Local.sRET.Trim,<>,"","And",v.Local.sRET.Trim, <>, 0)
+	'f.Intrinsic.UI.Msgbox(v.Local.sRET)
+		F.Intrinsic.String.Split(V.Local.sRET,"*!*",V.Local.sRET)
+			v.local.sRET.RedimPreserve(0, v.Local.sRET.UBound)
+		F.Intrinsic.Math.Add(V.Local.iRedimUbound,1,V.Local.iRedimUbound)
+		F.Intrinsic.Control.If(V.Local.iRedimUbound,=,0)
+			V.uGlobal.uIMMOutput.Redim(0,0)
+		F.Intrinsic.Control.Else
+			V.uGlobal.uIMMOutput.RedimPreserve(0,V.Local.iRedimUbound)
+		F.Intrinsic.Control.EndIf
+		'V.uGlobal.uIMMData(V.Local.sRET(0))!PiecesPerCarton.Set(23)
+		V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!JOB.Set(V.uGlobal.uIMMData(V.Local.sRET(0))!Job)
+		V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!LMO.Set(V.uGlobal.uIMMData(V.Local.sRET(0))!LMO)
+		V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!Scheduled.Set(V.uGlobal.uIMMData(V.Local.sRET(0))!Scheduled)
+		
+		F.Intrinsic.Control.For(V.Local.iCount2,0,V.Local.sRET.UBound,1)
+			F.Intrinsic.Control.If(V.uGlobal.uIMMData(V.Local.sRET(V.Local.iCount2))!LMO,=,"L")
+				V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!Press.Set(V.uGlobal.uIMMData(V.Local.sRET(V.Local.iCount2))!Press)
+				V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!Hours.Set(V.uGlobal.uIMMData(V.Local.sRET(V.Local.iCount2))!JobOPHours)
+				F.Intrinsic.Control.ExitFor(V.Local.iCount2)
+			F.Intrinsic.Control.EndIF
+		F.Intrinsic.Control.Next(V.Local.iCount2)
+
+		V.Local.sRouter.Set(V.uGlobal.uIMMData(V.Local.sRET(0))!Router)
+'
+'F.Intrinsic.Control.If(V.Local.sRouter,=,"ABC-10")
+'F.Intrinsic.Debug.InvokeDebugger
+'F.Intrinsic.Debug.Stop
+'F.Intrinsic.Control.EndIf
+
+
+		V.Local.inc.Declare(Long)
+		V.Local.inc.Set(1)
+
+'		F.Intrinsic.String.Concat("Select * From V_Router_Line where Router  = '",V.Local.sRouter,"' and Line_Router <> '' and PART_WC_OUTSIDE <> '' Order by Line_Router",V.Local.sSQL0)
+		F.Intrinsic.String.Concat("Select * from V_router_line where Router = '",V.Local.sRouter,"' and LMO = 'C' and group_sequence = '000' and Flag_Main_Comment ='Y' order by line_router",V.Local.sSQL0)
+
+		F.ODBC.Connection!Conx.OpenRecordsetRO("rst0",V.Local.sSQL0)
+		F.Intrinsic.Control.If(V.ODBC.Conx!rst0.EOF,<>,True)
+					
+			F.Intrinsic.Control.DoUntil(V.ODBC.Conx!rst0.EOF,=,True)
+				
+				V.Local.sRouterInc.Set(V.ODBC.Conx!rst0.FieldValTrim!LINE_ROUTER)
+				F.Intrinsic.String.LPad(V.Local.sRouterInc,0,6,V.Local.sRouterInc)
+				V.Local.sComment.Set(V.ODBC.Conx!rst0.FieldValTrim!DESC_RT_LINE)
+
+					F.Intrinsic.Control.For(V.Local.iVar,1,3,1)
+						F.Intrinsic.Math.Add(V.Local.sRouterInc,1,V.Local.sRouterInc)
+						F.Intrinsic.String.LPad(V.Local.sRouterInc,0,6,V.local.sRouterInc)
+						F.Intrinsic.String.Concat("Select * From Router_Line where Router  = '",V.Local.sRouter,"' and Line_Router = '",V.Local.sRouterInc,"' Order by Line_Router",V.Local.sSQL2)
+						F.ODBC.Connection!Conx.OpenRecordsetRO("rst2",V.Local.sSQL2)
+
+						'Stores up to three description lines into one "comment", per Router Line
+						F.Intrinsic.Control.If(V.ODBC.Conx!rst2.EOF,<>,True)
+							V.Local.sComment2.Set(V.ODBC.Conx!rst2.FieldValTrim!DESC_RT_LINE)
+							F.Intrinsic.String.Concat(V.Local.sComment," ",V.Local.sComment2,V.Local.sComment)
+						F.Intrinsic.Control.EndIf
+						F.ODBC.Conx!rst2.Close
+					F.Intrinsic.Control.Next(V.Local.iVar)
+
+					'Stores up to eight comments per Router
+					F.Intrinsic.Control.SelectCase(V.Local.inc)
+						F.Intrinsic.Control.Case(1)
+							V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!comment_1.Set(V.Local.sComment)
+						F.Intrinsic.Control.Case(2)
+							V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!comment_2.Set(V.Local.sComment)
+						F.Intrinsic.Control.Case(3)
+							V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!comment_3.Set(V.Local.sComment)
+						F.Intrinsic.Control.Case(4)
+							V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!comment_4.Set(V.Local.sComment)
+						F.Intrinsic.Control.Case(5)
+							V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!comment_5.Set(V.Local.sComment)
+						F.Intrinsic.Control.Case(6)
+							V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!comment_6.Set(V.Local.sComment)
+						F.Intrinsic.Control.Case(7)
+							V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!comment_7.Set(V.Local.sComment)
+						F.Intrinsic.Control.Case(8)
+							V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!comment_8.Set(V.Local.sComment)
+					F.Intrinsic.Control.EndSelect
+
+				F.Intrinsic.Math.Add(V.Local.inc,1,V.Local.inc)
+				F.ODBC.Conx!rst0.MoveNext
+				F.Intrinsic.Control.Loop
+		F.Intrinsic.Control.EndIf
+		F.ODBC.Conx!rst0.Close
+		V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!QTY.Set(V.uGlobal.uIMMData(V.Local.sRET(0))!QTY)
+		V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!DueDate.Set(V.uGlobal.uIMMData(V.Local.sRET(0))!DueDate)
+		V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!PO.Set(V.uGlobal.uIMMData(V.Local.sRET(0))!PO)
+		V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!Part.Set(V.uGlobal.uIMMData(V.Local.sRET(0))!Part)
+'Part is actually the router from job_operations
+		F.Intrinsic.Variable.UDTSeek(V.uGlobal.uIMMInvData2!Router,V.uGlobal.uIMMData(V.Local.sRET(0))!Part,0,V.Local.sRET2)
+		F.Intrinsic.Control.If(V.Local.sRET2,<>,"")		
+			V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!MoldNumber.Set(V.uGlobal.uIMMInvData2(V.Local.sRET2)!MoldNumber)
+			V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!Description.Set(V.uGlobal.uIMMInvData2(V.Local.sRET2)!Description)
+			V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!TargetCycle.Set(V.uGlobal.uIMMInvData2(V.Local.sRET2)!TargetCycle)
+		F.intrinsic.Control.EndIf
+		V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!TotalMaterialReq.Set(V.uGlobal.uIMMData(V.Local.sRET(0))!JobOpHours)
+		
+		F.Intrinsic.Variable.UDTSeek(V.uGlobal.uIMMInvData!Part,V.uGlobal.uIMMData(V.Local.sRET(1))!Press,0,V.Local.sRET3)		
+		F.Intrinsic.Control.If(V.Local.sRET3,<>,"")		
+			F.Intrinsic.Control.If(V.uGlobal.uIMMInvData(V.Local.sRET3)!ProductLine,=,"R2")
+				V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!TotalColorantReq.Set(V.uGlobal.uIMMData(V.Local.sRET(1))!JobOpHours)
+			F.Intrinsic.Control.EndIf
+		F.Intrinsic.Control.EndIf
+'		Function.Intrinsic.Debug.InvokeDebugger
+'		Function.Intrinsic.Debug.Stop
+		
+		F.Intrinsic.Control.If(V.uGlobal.uIMMData(V.Local.sRET(0))!LMO,=,"M")
+		
+			f.Intrinsic.String.Build("select part, Hours_Estimated from JOB_OPERATIONS where job = '{0}'and lmo = 'M' and Router_seq = '000100'", V.uGlobal.uIMMData(V.Local.sRET(0))!Job, v.Local.sSQLMaterials)
+			f.Data.DataTable.CreateFromSQL("JobDT100", "conx", v.Local.sSQLMaterials)
+			
+			f.Intrinsic.String.Build("select part, Hours_Estimated from JOB_OPERATIONS where job = '{0}'and lmo = 'M' and Router_seq = '000150'", V.uGlobal.uIMMData(V.Local.sRET(0))!Job, v.Local.sSQLMaterials)
+			f.Data.DataTable.CreateFromSQL("JobDT150", "conx", v.Local.sSQLMaterials)
+			
+			v.uGlobal.uIMMOutput(V.Local.iRedimUbound)!MaterialNumber.Set(v.DataTable.JobDT100(0).Part!FieldValTrim)
+			V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!TotalMaterialReq.Set(v.DataTable.JobDT100(0).Hours_Estimated!FieldValTrim)
+			
+			f.Intrinsic.Control.If(v.DataTable.JobDT150.RowCount, =, 1)
+				V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!MaterialNumber2.Set(v.DataTable.JobDT150(0).Part!FieldValTrim)
+				V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!TotalMaterialReq2.Set(v.DataTable.JobDT150(0).Hours_Estimated!FieldValTrim)
+			f.Intrinsic.Control.EndIf
+			
+			f.Data.DataTable.Close("JobDT100")
+			f.Data.DataTable.Close("JobDT150")
+		F.Intrinsic.Control.EndIf
+		V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!PiecesBox.Set(V.uGlobal.uIMMData(V.local.sRET(0))!PiecesPerCarton)
+
+		V.Local.iQTY.Set(V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!QTY)
+		V.Local.iQTYINV.Set(V.uGlobal.uIMMData(V.local.sRET(0))!PiecesPerCarton)
+
+		F.Intrinsic.Control.If(V.Local.iQTYINV,>,0)
+			F.Intrinsic.Math.Div(V.Local.iQTY,V.Local.iQTYINV,V.Local.FBoxes)
+		F.Intrinsic.Control.Else
+			V.Local.FBoxes.Set(1)
+		F.Intrinsic.Control.EndIf
+
+		V.uGlobal.uIMMOutput(V.Local.iRedimUbound)!BoxesReq.Set(V.Local.fBoxes)
+		
+	F.Intrinsic.Control.EndIf
+	'f.Intrinsic.UI.Msgbox(v.Local.iCount)
+	
+'f.Intrinsic.Control.If(v.Local.iCount, =, "70")
+'Function.Intrinsic.Debug.InvokeDebugger
+'Function.Intrinsic.Debug.Stop
+'f.Intrinsic.UI.Msgbox(v.Local.iCount)
+'f.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Next(V.Local.iCount)
+
+Program.Sub.ProcessIMM.End
+
+Program.Sub.ProcessAMBY.Start
+V.Local.sQuery.Declare(String)
+V.Local.sSQL0.Declare(String)
+V.Local.iVar1.Declare(Long)
+V.Local.sSQL.Declare(String)
+V.Local.sSQL1.Declare(String)
+V.Local.sSQL2.Declare(String)
+V.Local.iCount.Declare(Long)
+V.Local.iCount2.Declare(Long)
+V.Local.iCount3.Declare(Long)
+V.Local.sRET.Declare(String)
+V.Local.sRET2.Declare(String)
+V.Local.sRET3.Declare(String)
+V.Local.sRET4.Declare(String)
+V.Local.sRET5.Declare(String)
+V.Local.sjob.Declare(String)
+V.Local.sRouter.Declare(String)
+V.Local.sRouterSeq.Declare(String)
+V.Local.sRouterInc.Declare(String)
+V.Local.sComment.Declare(String)
+V.Local.sComment2.Declare(String)
+V.Local.sFullComment.Declare(String)
+V.Local.iVar.Declare(Long)
+V.Local.fBoxes.Declare(Float)
+V.Local.iRedimUbound.Declare(String)
+V.Local.iRedimUbound.Set(-1)
+V.uGlobal.uAMBYOUTPUT.Redim(-1,-1)
+
+
+F.Intrinsic.Control.For(V.Local.iCount,0,V.uGlobal.uAMBYKey.Ubound,1)
+	F.Intrinsic.Variable.UDTMultiSeek(V.uGlobal.uAMBYDATA!JOB,V.uGlobal.uAMBYKey(V.Local.iCount)!JOB,V.uGlobal.uAMBYDATA!press,V.uGlobal.uAMBYKey(V.local.iCOunt)!Machine,V.uGlobal.uAMBYDATA!SEQ,V.uGLobal.uAMBYKey(V.local.icount)!sEQ,V.Local.sRET)
+	F.Intrinsic.Control.If(V.Local.sRET,<>,"")
+		F.Intrinsic.String.Split(V.Local.sRET,"*!*",V.Local.sRET)
+		F.Intrinsic.Math.Add(V.Local.iRedimUbound,1,V.Local.iRedimUbound)
+		F.Intrinsic.Control.If(V.Local.iRedimUbound,=,0)
+			V.uGlobal.uAMBYOutput.Redim(0,0)
+		F.Intrinsic.Control.Else
+			V.uGlobal.uAMBYOutput.RedimPreserve(0,V.Local.iRedimUbound)
+		F.Intrinsic.Control.EndIf
+
+		V.uGlobal.uAMBYOutput(V.Local.iRedimUbound)!Workcenter.Set(V.uGlobal.uAMBYData(V.Local.sRET(0))!Press)
+		V.uGlobal.uAMBYOutput(V.Local.iRedimUbound)!WorkcenterName.Set(V.uGlobal.uAMBYData(V.Local.sRET(0))!WCName)
+		V.uGlobal.uAMBYOutput(V.Local.iRedimUbound)!JOB.Set(V.uGlobal.uAMBYData(V.Local.sRET(0))!Job)
+
+		V.local.sjob.Set(V.uGlobal.uAMBYData(V.Local.sRET(0))!Job)
+
+		V.uGlobal.uAMBYOutput(V.Local.iRedimUbound)!Customer.Set(V.uGlobal.uAMBYData(V.Local.sRET(0))!Customer)
+		V.uGlobal.uAMBYOutput(V.Local.iRedimUbound)!PO.Set(V.uGlobal.uAMBYData(V.Local.sRET(0))!PO)
+		V.uGlobal.uAMBYOutput(V.Local.iRedimUbound)!ShipDate.Set(V.uGlobal.uAMBYData(V.Local.sRET(0))!DueDate)
+		V.uGlobal.uAMBYOutput(V.Local.iRedimUbound)!Part.Set(V.uGlobal.uAMBYData(V.Local.sRET(0))!Part)
+		V.uGlobal.uAMBYOutput(V.Local.iRedimUbound)!QTY.Set(V.uGlobal.uAMBYData(V.Local.sRET(0))!QTY)
+		V.uGlobal.uAMBYOutput(V.Local.iRedimUbound)!RunHours.Set(V.uGlobal.uAMBYData(V.Local.sRET(0))!Hours)
+		
+		V.uGlobal.uAMBYOutput(V.Local.iRedimUbound)!Router.Set(V.uGlobal.uAMBYData(V.Local.sRET(0))!Router)
+		V.Local.sRouter.Set(V.uGlobal.uAMBYData(V.Local.sRET(0))!Router)
+'		F.Intrinsic.Control.If(V.Local.sRouter,=,"210900-4")
+'			F.Intrinsic.Debug.InvokeDebugger
+'			F.Intrinsic.Debug.Stop
+'		F.Intrinsic.Control.EndIf
+
+		V.uGlobal.uAMBYOutput(V.Local.iRedimUbound)!Router_Seq.Set(V.uGlobal.uAMBYData(V.Local.sRET(0))!Router_Seq)
+
+'F.Intrinsic.Debug.InvokeDebugger
+'F.Intrinsic.Debug.Stop
+		V.Local.inc.Declare(Long)
+		V.Local.inc.Set(1)
+
+'		F.Intrinsic.String.Concat("Select * From V_Router_Line where Router  = ' ",V.Local.sRouter,"' and Line_Router <> '' and PART_WC_OUTSIDE <> '' Order by Line_Router",V.Local.sSQL0)
+		F.Intrinsic.String.Concat("Select * from V_router_line where Router = '",V.Local.sRouter,"' and LMO = 'C' and group_sequence = '000' and Flag_Main_Comment ='Y' order by line_router",V.Local.sSQL0)
+		F.ODBC.Connection!Conx.OpenRecordsetRO("rst0",V.Local.sSQL0)
+
+		F.Intrinsic.Control.If(V.ODBC.Conx!rst0.EOF,<>,True)
+					
+			F.Intrinsic.Control.DoUntil(V.ODBC.Conx!rst0.EOF,=,True)
+				
+				V.Local.sRouterInc.Set(V.ODBC.Conx!rst0.FieldValTrim!LINE_ROUTER)
+				F.Intrinsic.String.LPad(V.Local.sRouterInc,0,6,V.Local.sRouterInc)
+				V.Local.sComment.Set(V.ODBC.Conx!rst0.FieldValTrim!DESC_RT_LINE)
+				
+				F.Intrinsic.Control.For(V.Local.iVar,1,3,1)
+					F.Intrinsic.Math.Add(V.Local.sRouterInc,1,V.Local.sRouterInc)
+					F.Intrinsic.String.LPad(V.Local.sRouterInc,0,6,V.local.sRouterInc)
+					F.Intrinsic.String.Concat("Select * From Router_Line where Router  = '",V.Local.sRouter,"' and Line_Router = '",V.Local.sRouterInc,"' Order by Line_Router",V.Local.sSQL2)
+					F.ODBC.Connection!Conx.OpenRecordsetRO("rst2",V.Local.sSQL2)
+
+					'Stores up to three description lines into one "comment", per Router Line
+					F.Intrinsic.Control.If(V.ODBC.Conx!rst2.EOF,<>,True)
+						V.Local.sComment2.Set(V.ODBC.Conx!rst2.FieldValTrim!DESC_RT_LINE)
+						F.Intrinsic.String.Concat(V.Local.sComment," ",V.Local.sComment2,V.Local.sComment)
+'							F.Intrinsic.String.Concat(V.Local.sComment,V.Ambient.NewLine,V.Local.sComment2,V.Local.sComment)
+					F.Intrinsic.Control.EndIf
+					F.ODBC.Conx!rst2.Close
+				F.Intrinsic.Control.Next(V.Local.iVar)
+
+				'Stores up to eight comments per Router
+				F.Intrinsic.Control.SelectCase(V.Local.inc)
+					F.Intrinsic.Control.Case(1)
+						V.uGlobal.uAMBYOutput(V.Local.iRedimUbound)!comment_1.Set(V.Local.sComment)
+					F.Intrinsic.Control.Case(2)
+						V.uGlobal.uAMBYOutput(V.Local.iRedimUbound)!comment_2.Set(V.Local.sComment)
+					F.Intrinsic.Control.Case(3)
+						V.uGlobal.uAMBYOutput(V.Local.iRedimUbound)!comment_3.Set(V.Local.sComment)
+					F.Intrinsic.Control.Case(4)
+						V.uGlobal.uAMBYOutput(V.Local.iRedimUbound)!comment_4.Set(V.Local.sComment)
+					F.Intrinsic.Control.Case(5)
+						V.uGlobal.uAMBYOutput(V.Local.iRedimUbound)!comment_5.Set(V.Local.sComment)
+					F.Intrinsic.Control.Case(6)
+						V.uGlobal.uAMBYOutput(V.Local.iRedimUbound)!comment_6.Set(V.Local.sComment)
+					F.Intrinsic.Control.Case(7)
+						V.uGlobal.uAMBYOutput(V.Local.iRedimUbound)!comment_7.Set(V.Local.sComment)
+					F.Intrinsic.Control.Case(8)
+						V.uGlobal.uAMBYOutput(V.Local.iRedimUbound)!comment_8.Set(V.Local.sComment)
+				F.Intrinsic.Control.EndSelect
+
+				F.Intrinsic.Math.Add(V.Local.inc,1,V.Local.inc)
+				F.ODBC.Conx!rst0.MoveNext
+				F.Intrinsic.Control.Loop
+		F.Intrinsic.Control.EndIf
+		F.ODBC.Conx!rst0.Close
+
+
+''''		V.Local.sRET5.Set(V.uGlobal.uAMBYData(V.Local.sRET(0))!Part)
+		F.Intrinsic.Variable.UDTSeek(V.uGlobal.uAMBYInvData!Part,V.uGlobal.uAMBYData(V.Local.sRET(0))!Part,0,V.Local.sRET2)
+		F.Intrinsic.Control.If(V.Local.sRET2,<>,"")
+			V.uGlobal.uAMBYOutput(V.Local.iRedimUbound)!Description.Set(V.uGlobal.uAMBYInvData(V.Local.sRET2)!Description)
+			V.uGlobal.uAMBYOutput(V.Local.iRedimUbound)!PiecesBox.Set(V.uGlobal.uAMBYInvData(V.Local.sRET2)!QTY)
+
+			F.Intrinsic.Control.If(V.uGlobal.uAMBYInvData(V.Local.sRET2)!QTY,<>,0)
+				F.Intrinsic.Math.Div(V.uGlobal.uAMBYData(V.Local.sRET(0))!QTY,V.uGlobal.uAMBYInvData(V.Local.sRET2)!QTY,V.Local.fBoxes)
+'			F.Intrinsic.Control.Else
+'				V.Local.iBoxes.SET(V.uGlobal.uAMBYData(V.Local.sRET(0))!QTY)
+			F.Intrinsic.Control.EndIf
+		
+			V.uGlobal.uAMBYOutput(V.Local.iRedimUbound)!Boxes.Set(V.Local.fBoxes)
+			F.Intrinsic.Variable.UDTSeek(V.uGlobal.uAMBYDATA!JOB,V.uGlobal.uAMBYKey(V.Local.iCount)!JOB,0,V.Local.sRET2)
+			F.Intrinsic.String.Split(V.Local.sRET2,"*!*",V.Local.sRET2)
+			V.Local.sRet5.SET(V.uGlobal.uAMBYData(V.Local.sRET2(0))!Press)
+			V.uGlobal.uAMBYOutput(V.Local.iRedimUbound)!BaseRotor1.Set(V.Local.sRet5)
+			V.Local.sRet5.SET(V.uGlobal.uAMBYData(V.Local.sRET2(1))!Press)
+			V.uGlobal.uAMBYOutput(V.Local.iRedimUbound)!BaseRotor2.Set(V.Local.sRet5)
+		F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.Next(V.Local.iCount)
+
+Program.Sub.ProcessAMBY.End
+
+Program.Sub.LoadUDTS.Start
+V.Local.sQuery.Declare(String)
+V.Local.iCount.Declare(Long)
+
+'''
+'F.Intrinsic.Debug.InvokeDebugger
+'F.Intrinsic.Debug.Stop
+
+'AMBY
+F.Intrinsic.String.Concat("SELECT WORKCENTERS.MACHINE, JOB_HEADER.JOB, JOB_OPERATIONS.SEQ FROM WORKCENTERS INNER JOIN JOB_OPERATIONS ON JOB_OPERATIONS.PART = WORKCENTERS.MACHINE INNER JOIN JOB_HEADER ON JOB_HEADER.JOB = JOB_OPERATIONS.JOB WHERE WORKCENTERS.WC_DEPT = 'AMBY' ORDER BY JOB_OPERATIONS.JOB","",V.Local.sQuery)
+Function.ODBC.Connection!Conx.OpenRecordsetRO("rstAMBYKEY",V.Local.sQuery)
+F.Intrinsic.Variable.LoadUDTFromRecordset("conx","rstAMBYKEY","V.uGlobal.uAMBYKEY",False)
+
+'F.Intrinsic.String.Concat("SELECT DISTINCT JOB_HEADER.JOB, JOB_OPERATIONS.SEQ, JOB_OPERATIONS.LMO, JOB_HEADER.DATE_OPENED AS SCHEDULED, JOB_OPERATIONS.PART AS PRESS, WORKCENTERS.WC_NAME, JOB_HEADER.DATE_START AS START_DATE, JOB_HEADER.DATE_DUE AS DUE_DATE, JOB_HEADER.CUSTOMER, JOB_HEADER.CUSTOMER_PO AS PO, JOB_OPERATIONS.ROUTER AS PART, JOB_HEADER.QTY_ORDER AS QTY, JOB_OPERATIONS.PART AS MATERIAL_NUM, JOB_OPERATIONS.HOURS_ESTIMATED AS HOURS FROM JOB_OPERATIONS INNER JOIN JOB_HEADER ON JOB_HEADER.JOB = JOB_OPERATIONS.JOB LEFT OUTER JOIN WORKCENTERS ON WORKCENTERs.MACHINE = JOB_OPERATIONS.PART ORDER BY JOB_HEADER.JOB, JOB_OPERATIONS.SEQ","",V.Local.sQuery)
+F.Intrinsic.String.Concat("SELECT DISTINCT JOB_HEADER.JOB, JOB_OPERATIONS.SEQ, JOB_OPERATIONS.LMO, JOB_OPERATIONS.ROUTER, JOB_OPERATIONS.ROUTER_SEQ, JOB_HEADER.DATE_OPENED AS SCHEDULED, JOB_OPERATIONS.PART AS PRESS, WORKCENTERS.WC_NAME, JOB_HEADER.DATE_START AS START_DATE, JOB_HEADER.DATE_DUE AS DUE_DATE, JOB_HEADER.CUSTOMER, JOB_HEADER.CUSTOMER_PO AS PO, JOB_OPERATIONS.ROUTER AS PART, JOB_HEADER.QTY_ORDER AS QTY, JOB_OPERATIONS.PART AS MATERIAL_NUM, JOB_OPERATIONS.HOURS_ESTIMATED AS HOURS FROM JOB_OPERATIONS INNER JOIN JOB_HEADER ON JOB_HEADER.JOB = JOB_OPERATIONS.JOB LEFT OUTER JOIN WORKCENTERS ON WORKCENTERs.MACHINE = JOB_OPERATIONS.PART ORDER BY JOB_HEADER.JOB, JOB_OPERATIONS.SEQ","",V.Local.sQuery)
+
+Function.ODBC.Connection!Conx.OpenRecordsetRO("rstAMBYDATA",V.Local.sQuery)
+F.Intrinsic.Variable.LoadUDTFromRecordset("conx","rstAMBYDATA","V.uGlobal.uAMBYDATA",False)
+
+F.Intrinsic.String.Concat("SELECT INVENTORY_MSTR.PART, INVENTORY_MSTR.PRODUCT_LINE, INVENTORY_MSTR.DESCRIPTION, INVENTORY_MSTR.QTY_ORDER AS QTY FROM INVENTORY_MSTR ORDER BY INVENTORY_MSTR.PART","",V.Local.sQuery)
+Function.ODBC.Connection!Conx.OpenRecordsetRO("rstAMBYInvDATA",V.Local.sQuery)
+F.Intrinsic.Variable.LoadUDTFromRecordset("conx","rstAMBYInvDATA","V.uGlobal.uAMBYInvDATA",False)
+
+'IMM
+
+F.Intrinsic.String.Concat("SELECT DISTINCT JOB_OPERATIONS.JOB FROM JOB_OPERATIONS INNER JOIN WORKCENTERS ON WORKCENTERS.MACHINE = JOB_OPERATIONS.PART WHERE WC_DEPT = 'IMM'","",V.Local.sQuery)
+Function.ODBC.Connection!Conx.OpenRecordsetRO("rstIMMKEY",V.Local.sQuery)
+F.Intrinsic.Variable.LoadUDTFromRecordset("conx","rstIMMKEY","V.uGlobal.uIMMKey",False)
+
+'F.Intrinsic.String.Concat("SELECT DISTINCT JOB_OPERATIONS.JOB, JOB_OPERATIONS.SEQ, JOB_OPERATIONS.LMO, JOB_OPERATIONS.PART AS PRESS, JOB_OPERATIONS.ROUTER AS PART, JOB_OPERATIONS.HOURS_ESTIMATED AS JobOPHours, JOB_HEADER.DATE_OPENED AS SCHEDULED,JOB_HEADER.DATE_DUE AS DUE_DATE, JOB_HEADER.CUSTOMER_PO AS PO, JOB_HEADER.QTY_ORDER AS QTY, INVENTORY_MST3.PCS_PER_CNTNR AS PPC FROM JOB_OPERATIONS LEFT OUTER JOIN JOB_HEADER ON JOB_HEADER.JOB = JOB_OPERATIONS.JOB LEFT OUTER JOIN ROUTER_LINE ON ROUTER_LINE.ROUTER = JOB_OPERATIONS.ROUTER LEFT OUTER JOIN INVENTORY_MST3 ON INVENTORY_MST3.PART = JOB_OPERATIONS.ROUTER WHERE JOB_OPERATIONS.JOB IN (SELECT DISTINCT JOB_OPERATIONS.JOB FROM JOB_OPERATIONS INNER JOIN WORKCENTERS ON WORKCENTERS.MACHINE = JOB_OPERATIONS.PART WHERE WC_DEPT = 'IMM') ORDER BY JOB_OPERATIONS.JOB","",V.Local.sQuery)
+
+F.Intrinsic.String.Concat("SELECT DISTINCT JOB_OPERATIONS.JOB, JOB_OPERATIONS.SEQ, JOB_OPERATIONS.LMO, JOB_OPERATIONS.ROUTER, JOB_OPERATIONS.ROUTER_SEQ, JOB_OPERATIONS.PART AS PRESS, JOB_OPERATIONS.ROUTER AS PART, JOB_OPERATIONS.HOURS_ESTIMATED AS JobOPHours, JOB_HEADER.DATE_OPENED AS SCHEDULED,JOB_HEADER.DATE_DUE AS DUE_DATE, JOB_HEADER.CUSTOMER_PO AS PO, JOB_HEADER.QTY_ORDER AS QTY, INVENTORY_MST3.PCS_PER_CNTNR AS PPC FROM JOB_OPERATIONS LEFT OUTER JOIN JOB_HEADER ON JOB_HEADER.JOB = JOB_OPERATIONS.JOB LEFT OUTER JOIN ROUTER_LINE ON ROUTER_LINE.ROUTER = JOB_OPERATIONS.ROUTER LEFT OUTER JOIN INVENTORY_MST3 ON INVENTORY_MST3.PART = JOB_OPERATIONS.ROUTER WHERE JOB_OPERATIONS.JOB IN (SELECT DISTINCT JOB_OPERATIONS.JOB FROM JOB_OPERATIONS INNER JOIN WORKCENTERS ON WORKCENTERS.MACHINE = JOB_OPERATIONS.PART WHERE WC_DEPT = 'IMM') ORDER BY JOB_OPERATIONS.JOB","",V.Local.sQuery)
+Function.ODBC.Connection!Conx.OpenRecordsetRO("rstIMMDATA",V.Local.sQuery)
+F.Intrinsic.Variable.LoadUDTFromRecordset("conx","rstIMMDATA","V.uGlobal.uIMMData",False)
+
+F.Intrinsic.String.Concat("select INVENTORY_MSTR.PART AS INV_PART, INVENTORY_MSTR.PRODUCT_LINE, INVENTORY_MSTR.DESCRIPTION, INVENTORY_MSTR.QTY_ORDER AS TOTAL_MATERIAL, INVENTORY_MST2.TEXT_INFO2 AS TARGET_CYCLE, INVENTORY_MSTR.QTY_ORDER AS QTY FROM INVENTORY_MSTR LEFT JOIN INVENTORY_MST2 ON INVENTORY_MSTR.PART = INVENTORY_MST2.PART WHERE INVENTORY_MSTR.PRODUCT_LINE = 'R1' OR INVENTORY_MSTR.PRODUCT_LINE = 'R2'","",V.Local.sQuery)
+Function.ODBC.Connection!Conx.OpenRecordsetRO("rstIMMInvData",V.Local.sQuery)
+	F.Intrinsic.Variable.LoadUDTFromRecordset("conx","rstIMMInvData","V.uGlobal.uIMMInvData",False)
+
+'V.Local.sQuery.set("select INVENTORY_MSTR.PART AS JOB_OP_PART, INVENTORY_MST2.TEXT_INFO1 AS MOLD_NO, INVENTORY_MSTR.DESCRIPTION, INVENTORY_MST2.TEXT_INFO2 AS TARGET_CYCLE FROM INVENTORY_MSTR LEFT JOIN INVENTORY_MST2 ON INVENTORY_MSTR.PART = INVENTORY_MST2.PART")
+F.Intrinsic.String.Concat("select INVENTORY_MSTR.PART AS JOB_OP_PART, INVENTORY_MST2.TEXT_INFO1 AS MOLD_NO, INVENTORY_MSTR.DESCRIPTION, INVENTORY_MST2.TEXT_INFO2 AS TARGET_CYCLE FROM INVENTORY_MSTR LEFT JOIN INVENTORY_MST2 ON INVENTORY_MSTR.PART = INVENTORY_MST2.PART WHERE INVENTORY_MSTR.PART IN (SELECT JOB_OPERATIONS.ROUTER FROM JOB_OPERATIONS WHERE JOB_OPERATIONS.JOB IN (SELECT DISTINCT JOB_OPERATIONS.JOB FROM JOB_OPERATIONS INNER JOIN WORKCENTERS ON WORKCENTERS.MACHINE = JOB_OPERATIONS.PART WHERE WC_DEPT = 'IMM') AND JOB_OPERATIONS.SEQ = '000100' OR JOB_OPERATIONS.SEQ = '000200') ORDER BY INVENTORY_MSTR.PART","",V.Local.sQuery)
+Function.ODBC.Connection!Conx.OpenRecordsetRO("rstIMMInvData2",V.Local.sQuery)
+F.Intrinsic.Variable.LoadUDTFromRecordset("conx","rstIMMInvData2","V.uGlobal.uIMMInvData2",False)
+
+
+
+Program.Sub.LoadUDTS.End
+
+Program.Sub.Comments.Start
+${$0$}$Open_WO$}$SUPERVSR$}$12/11/2012
+Program.Sub.Comments.End
+
